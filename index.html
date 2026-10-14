@@ -1,0 +1,2189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keeva Money — Master Admin Ultra Pro</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase Compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary: #635bff;
+            --primary-dark: #4b44db;
+            --secondary: #22c7a5;
+            --bg-dark: #0b0f19;
+            --panel-bg: rgba(17, 24, 39, 0.95);
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark);
+            color: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 99px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 91, 255, 0.5);
+        }
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+        }
+        .nav-btn.active {
+            background: linear-gradient(135deg, #635bff 0%, #4b44db 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(99, 91, 255, 0.35);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row antialiased">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="w-full md:w-64 glass-panel border-r border-white/10 flex flex-col shrink-0 z-30">
+        <!-- Logo Header -->
+        <div class="p-5 border-b border-white/10 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-teal-400 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-500/20">
+                    K
+                </div>
+                <div>
+                    <h1 class="text-sm font-extrabold tracking-tight text-white uppercase">Keeva Admin</h1>
+                    <span class="text-[9px] font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1 font-mono">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Ultra Pro
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="p-3 space-y-1 flex-1 overflow-y-auto custom-scrollbar">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn active w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <i class="fa-solid fa-gauge-high w-4 text-center"></i>
+                <span>Dashboard</span>
+            </button>
+            <button onclick="switchTab('withdrawals')" id="nav-withdrawals" class="nav-btn w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-building-columns w-4 text-center text-amber-400"></i>
+                    <span>Withdrawals</span>
+                </div>
+                <span id="badge-withdrawals" class="hidden px-2 py-0.5 text-[10px] font-black rounded-full bg-amber-500 text-black">0</span>
+            </button>
+            <button onclick="switchTab('deposits')" id="nav-deposits" class="nav-btn w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-receipt w-4 text-center text-emerald-400"></i>
+                    <span>Deposits / UTR</span>
+                </div>
+                <span id="badge-deposits" class="hidden px-2 py-0.5 text-[10px] font-black rounded-full bg-emerald-500 text-black">0</span>
+            </button>
+            <button onclick="switchTab('users')" id="nav-users" class="nav-btn w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <i class="fa-solid fa-users w-4 text-center text-sky-400"></i>
+                <span>Users & 1-Click Wipe</span>
+            </button>
+            <button onclick="switchTab('aviator')" id="nav-aviator" class="nav-btn w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <i class="fa-solid fa-plane-up w-4 text-center text-red-400"></i>
+                <span>Aviator Rig (Auto/Fix/Kill)</span>
+            </button>
+            <button onclick="switchTab('notifications')" id="nav-notifications" class="nav-btn w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <i class="fa-solid fa-bell w-4 text-center text-amber-500"></i>
+                <span>Notifications (Edit/Del)</span>
+            </button>
+            <button onclick="switchTab('update-popup')" id="nav-update-popup" class="nav-btn w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <i class="fa-solid fa-cloud-arrow-down w-4 text-center text-cyan-400"></i>
+                <span>App Update Popup</span>
+            </button>
+            <button onclick="switchTab('products')" id="nav-products" class="nav-btn w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <i class="fa-solid fa-cubes w-4 text-center text-purple-400"></i>
+                <span>Plans & Products</span>
+            </button>
+            <button onclick="switchTab('promos')" id="nav-promos" class="nav-btn w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <i class="fa-solid fa-gift w-4 text-center text-pink-400"></i>
+                <span>Promo Gift Codes</span>
+            </button>
+            <button onclick="switchTab('support')" id="nav-support" class="nav-btn w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-headset w-4 text-center text-cyan-400"></i>
+                    <span>Live Chat Support</span>
+                </div>
+                <span id="badge-chats" class="hidden px-2 py-0.5 text-[10px] font-black rounded-full bg-cyan-500 text-black">0</span>
+            </button>
+            <button onclick="switchTab('tickets')" id="nav-tickets" class="nav-btn w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-triangle-exclamation w-4 text-center text-red-400"></i>
+                    <span>Problem Tickets</span>
+                </div>
+                <span id="badge-tickets" class="hidden px-2 py-0.5 text-[10px] font-black rounded-full bg-red-500 text-white">0</span>
+            </button>
+            <button onclick="switchTab('banners')" id="nav-banners" class="nav-btn w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <i class="fa-solid fa-images w-4 text-center text-yellow-400"></i>
+                <span>Banners</span>
+            </button>
+            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all">
+                <i class="fa-solid fa-sliders w-4 text-center text-indigo-400"></i>
+                <span>QR, UPI & Settings</span>
+            </button>
+        </nav>
+
+        <div class="p-3 border-t border-white/10 text-[11px] text-slate-400 font-mono text-center">
+            Database: Connected <i class="fa-solid fa-circle-check text-emerald-400 ml-1"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT VIEWPORT -->
+    <main class="flex-1 flex flex-col overflow-y-auto max-h-screen custom-scrollbar">
+        <!-- Top App Bar -->
+        <header class="p-4 md:px-8 glass-panel border-b border-white/10 flex justify-between items-center sticky top-0 z-20">
+            <div>
+                <h2 id="section-title" class="text-base font-extrabold text-white">Dashboard Overview</h2>
+                <p id="section-subtitle" class="text-[11px] text-slate-400">Real-time statistics & global app control.</p>
+            </div>
+            <div class="flex items-center space-x-3 font-mono text-xs">
+                <span class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-server text-indigo-400"></i>
+                    <span>Firebase Live RTDB</span>
+                </span>
+            </div>
+        </header>
+
+        <!-- SECTIONS WRAPPER -->
+        <div class="p-4 md:p-8 space-y-6">
+
+            <!-- 1. DASHBOARD OVERVIEW -->
+            <section id="tab-dashboard" class="admin-tab space-y-6">
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="glass-panel p-5 rounded-2xl space-y-2 border border-indigo-500/20">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Users</span>
+                            <i class="fa-solid fa-users text-indigo-400 text-lg"></i>
+                        </div>
+                        <h3 id="stat-total-users" class="text-2xl font-black text-white font-mono">0</h3>
+                        <p class="text-[10px] text-slate-500">Registered Accounts</p>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl space-y-2 border border-emerald-500/20">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total User Balances</span>
+                            <i class="fa-solid fa-wallet text-emerald-400 text-lg"></i>
+                        </div>
+                        <h3 id="stat-total-balance" class="text-2xl font-black text-emerald-400 font-mono">₹0.00</h3>
+                        <p class="text-[10px] text-slate-500">Stored in Wallets</p>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl space-y-2 border border-amber-500/20">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Withdrawals</span>
+                            <i class="fa-solid fa-clock-rotate-left text-amber-400 text-lg"></i>
+                        </div>
+                        <h3 id="stat-pending-withdrawals" class="text-2xl font-black text-amber-400 font-mono">0</h3>
+                        <p class="text-[10px] text-slate-500">Requires Action</p>
+                    </div>
+
+                    <div class="glass-panel p-5 rounded-2xl space-y-2 border border-cyan-500/20">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Deposits</span>
+                            <i class="fa-solid fa-receipt text-cyan-400 text-lg"></i>
+                        </div>
+                        <h3 id="stat-pending-deposits" class="text-2xl font-black text-cyan-400 font-mono">0</h3>
+                        <p class="text-[10px] text-slate-500">Pending UTR Verification</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h4 class="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center space-x-2">
+                            <i class="fa-solid fa-bullhorn text-indigo-400"></i>
+                            <span>Update Top Marquee Announcement</span>
+                        </h4>
+                        <div class="flex gap-2">
+                            <input type="text" id="quick-marquee-input" placeholder="Type notice for top moving marquee bar..." class="flex-1 px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500">
+                            <button onclick="saveQuickMarquee()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 font-bold text-xs rounded-xl shadow-md uppercase">Save</button>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h4 class="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center space-x-2">
+                            <i class="fa-solid fa-qrcode text-emerald-400"></i>
+                            <span>Active Merchant UPI Gateway</span>
+                        </h4>
+                        <div class="flex gap-2">
+                            <input type="text" id="quick-upi-input" placeholder="e.g. auraenergy@ybl" class="flex-1 px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500">
+                            <button onclick="saveQuickUpi()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 font-bold text-xs rounded-xl shadow-md uppercase">Update</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. WITHDRAWALS MANAGEMENT (OPTIONAL UTR & OPTIONAL REJECT REASON) -->
+            <section id="tab-withdrawals" class="admin-tab hidden space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-white">Withdrawal Requests</h3>
+                        <p class="text-xs text-slate-400">Approve karein (UTR Optional) ya Reject karein (Reason Optional, balance automatically refund hoga).</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="filterWithdrawals('all')" class="px-3 py-1.5 bg-slate-900 text-xs font-bold rounded-lg border border-slate-800">All</button>
+                        <button onclick="filterWithdrawals('pending')" class="px-3 py-1.5 bg-amber-500/10 text-amber-400 text-xs font-bold rounded-lg border border-amber-500/20">Pending</button>
+                        <button onclick="filterWithdrawals('approved')" class="px-3 py-1.5 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-lg border border-emerald-500/20">Approved</button>
+                    </div>
+                </div>
+
+                <div id="withdrawals-table-container" class="glass-panel rounded-2xl overflow-hidden border border-white/10">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900/80 border-b border-white/10 text-[10px] font-black uppercase text-slate-400 font-mono">
+                                <tr>
+                                    <th class="p-3.5">User Details</th>
+                                    <th class="p-3.5">Account & Bank Info</th>
+                                    <th class="p-3.5">Payout Amount</th>
+                                    <th class="p-3.5">Status</th>
+                                    <th class="p-3.5">Date</th>
+                                    <th class="p-3.5 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="withdrawals-tbody" class="divide-y divide-white/5 font-mono">
+                                <tr><td colspan="6" class="p-6 text-center text-slate-500">Loading withdrawals...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. DEPOSITS MANAGEMENT -->
+            <section id="tab-deposits" class="admin-tab hidden space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-white">Deposit Requests (UTR Verification)</h3>
+                        <p class="text-xs text-slate-400">12-digit UTR verify karke direct user wallet credit karein.</p>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900/80 border-b border-white/10 text-[10px] font-black uppercase text-slate-400 font-mono">
+                                <tr>
+                                    <th class="p-3.5">User</th>
+                                    <th class="p-3.5">12-Digit UTR</th>
+                                    <th class="p-3.5">Amount</th>
+                                    <th class="p-3.5">Status</th>
+                                    <th class="p-3.5">Date Submitted</th>
+                                    <th class="p-3.5 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deposits-tbody" class="divide-y divide-white/5 font-mono">
+                                <tr><td colspan="6" class="p-6 text-center text-slate-500">Loading deposits...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. USERS MANAGEMENT (WITH 1-CLICK DELETE ALL USERS & 1-CLICK ALL RECOVER) -->
+            <section id="tab-users" class="admin-tab hidden space-y-5">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-white">User Accounts Manager</h3>
+                        <p class="text-xs text-slate-400">Search users, edit balance, suspend with custom notice, ya 1-Click me sabhi user delete/recover karein.</p>
+                    </div>
+                    
+                    <!-- 1-CLICK ACTIONS BAR -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="executeOneClickDeleteAllUsers()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black rounded-xl shadow-lg flex items-center gap-1.5 uppercase font-mono">
+                            <i class="fa-solid fa-bomb text-sm"></i>
+                            <span>1-Click Delete All Users</span>
+                        </button>
+                        <button onclick="executeOneClickRecoverAllUsers()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl shadow-lg flex items-center gap-1.5 uppercase font-mono">
+                            <i class="fa-solid fa-rotate-left text-sm"></i>
+                            <span>1-Click Recover All</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center gap-2">
+                    <input type="text" id="user-search-input" oninput="searchUsers()" placeholder="Search phone or name..." class="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 w-full sm:w-72">
+                    <span id="user-backup-status-text" class="text-[11px] font-mono text-slate-400 hidden"></span>
+                </div>
+
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900/80 border-b border-white/10 text-[10px] font-black uppercase text-slate-400 font-mono">
+                                <tr>
+                                    <th class="p-3.5">User Profile</th>
+                                    <th class="p-3.5">Password</th>
+                                    <th class="p-3.5">Wallet Balance</th>
+                                    <th class="p-3.5">Referrals</th>
+                                    <th class="p-3.5">Status</th>
+                                    <th class="p-3.5 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody" class="divide-y divide-white/5">
+                                <tr><td colspan="6" class="p-6 text-center text-slate-500 font-mono">Loading users...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. AVIATOR GAME RIG (AUTO / FIX MULTIPLIER / ANY USER BET KILL 1X) -->
+            <section id="tab-aviator" class="admin-tab hidden space-y-6">
+                <div class="glass-panel p-6 rounded-3xl border border-red-500/20 space-y-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-red-600/20 text-red-500 rounded-2xl flex items-center justify-center text-xl border border-red-500/30">
+                            <i class="fa-solid fa-plane-up"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold text-white">Aura Aviator Master Rig Console</h3>
+                            <p class="text-xs text-slate-400">Auto mode, Fixed Crash Point ya "Kisi bhi user ke bet lagate hi automatic 1x me crash" activate karein.</p>
+                        </div>
+                    </div>
+
+                    <!-- ULTRA KILL SWITCH: CRASH ON USER BET -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-r from-red-950/80 via-red-900/40 to-slate-950 border border-red-600/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+                                <h4 class="text-sm font-black text-red-400 uppercase tracking-wider font-mono">Kill Switch: Auto Crash on User Bet (1.00x - 1.02x)</h4>
+                            </div>
+                            <p class="text-xs text-slate-300">Jab bhi koi real user bet lagayega, plane turant 1x / 1.01x par crash ho jayega taaki payout na nikle.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span id="kill-mode-status-badge" class="px-3 py-1 rounded-full text-xs font-black uppercase font-mono bg-slate-800 text-slate-400">OFF</span>
+                            <button id="toggle-kill-mode-btn" onclick="toggleAviatorKillMode()" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-lg">
+                                Enable Kill Mode
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FIXED MULTIPLIER / AUTO RNG -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4">
+                            <span class="text-xs font-black text-white uppercase font-mono block">Set Fixed Crash Point / Multiplier</span>
+                            <div class="flex gap-2">
+                                <input type="number" id="forced-aviator-input" step="0.01" min="1.01" placeholder="e.g. 1.02 or 2.50 or 10.00" class="flex-1 px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-sm font-black font-mono text-red-400 focus:outline-none focus:border-red-500">
+                                <button onclick="setForcedAviatorCrash()" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs rounded-xl uppercase tracking-wider shadow-md">Apply Fix</button>
+                            </div>
+                            <div class="flex flex-wrap gap-2 pt-1">
+                                <button onclick="setQuickAviatorCrash(1.02)" class="px-3 py-1.5 bg-red-950/60 border border-red-900/60 text-red-400 font-mono text-xs rounded-lg font-bold">1.02x (Insta Crash)</button>
+                                <button onclick="setQuickAviatorCrash(1.20)" class="px-3 py-1.5 bg-red-950/60 border border-red-900/60 text-red-400 font-mono text-xs rounded-lg font-bold">1.20x</button>
+                                <button onclick="setQuickAviatorCrash(2.00)" class="px-3 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 font-mono text-xs rounded-lg font-bold">2.00x</button>
+                                <button onclick="setQuickAviatorCrash(5.00)" class="px-3 py-1.5 bg-emerald-950/60 border border-emerald-900/60 text-emerald-400 font-mono text-xs rounded-lg font-bold">5.00x</button>
+                                <button onclick="clearAviatorCrashOverride()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg font-bold">Random Auto Mode</button>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between space-y-4">
+                            <div>
+                                <span class="text-xs font-black text-white uppercase font-mono block">Active Game Configuration</span>
+                                <div class="mt-3 space-y-2 text-xs font-mono">
+                                    <div class="flex justify-between p-2 rounded-lg bg-slate-950 border border-slate-800">
+                                        <span class="text-slate-400">Current Mode:</span>
+                                        <strong id="aviator-active-mode-label" class="text-emerald-400">Random Auto RNG</strong>
+                                    </div>
+                                    <div class="flex justify-between p-2 rounded-lg bg-slate-950 border border-slate-800">
+                                        <span class="text-slate-400">Next Fixed Crash:</span>
+                                        <strong id="current-forced-crash-display" class="text-amber-400">None</strong>
+                                    </div>
+                                    <div class="flex justify-between p-2 rounded-lg bg-slate-950 border border-slate-800">
+                                        <span class="text-slate-400">Crash-On-Bet (1x Kill):</span>
+                                        <strong id="aviator-kill-active-label" class="text-slate-400">Disabled</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-500 leading-tight">Setting change karte hi bina reload ke user frontend par live apply hoti hai.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. ALL NOTIFICATIONS MANAGER (VIEW / EDIT / DELETE / BROADCAST) -->
+            <section id="tab-notifications" class="admin-tab hidden space-y-6">
+                <div class="glass-panel p-6 rounded-3xl border border-amber-500/20 space-y-4">
+                    <h3 class="text-sm font-extrabold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-bullhorn text-amber-400"></i>
+                        <span>Send New Notification / Broadcast Popup</span>
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Notification Title</label>
+                            <input type="text" id="notif-title-input" placeholder="e.g. Deposit Bonus Offer!" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Display Date/Time</label>
+                            <input type="text" id="notif-date-input" placeholder="Just now" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white">
+                        </div>
+                        <div class="md:col-span-2 space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Notification Content / Message</label>
+                            <textarea id="notif-message-input" rows="3" placeholder="Enter announcement text to display on user bell and popup..." class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white"></textarea>
+                        </div>
+                    </div>
+                    <button onclick="publishNewNotification()" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-lg">
+                        Dispatch Broadcast
+                    </button>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-xs font-black uppercase text-slate-400 tracking-wider">All Dispatched Notifications & History</h4>
+                        <button onclick="clearAllNotifications()" class="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 text-xs font-bold rounded-xl">
+                            Delete All Notifications
+                        </button>
+                    </div>
+                    <div id="notifications-list" class="space-y-3"></div>
+                </div>
+            </section>
+
+            <!-- 7. APP UPDATE POPUP MANAGER -->
+            <section id="tab-update-popup" class="admin-tab hidden space-y-6">
+                <div class="glass-panel p-6 rounded-3xl border border-cyan-500/20 space-y-5 max-w-3xl">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-cyan-500/20 text-cyan-400 rounded-2xl flex items-center justify-center text-xl border border-cyan-500/30">
+                            <i class="fa-solid fa-cloud-arrow-down"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold text-white">App Update Popup Controller</h3>
+                            <p class="text-xs text-slate-400">Users ko new APK version update ka popup dikhane aur APK download link configure karne ke liye.</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 text-xs font-sans">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase">Target Version (Current User App: 1.0.0)</label>
+                                <input type="text" id="update-version-input" placeholder="e.g. 2.0.0" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white font-mono font-bold">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase">Update Popup Title</label>
+                                <input type="text" id="update-title-input" placeholder="e.g. New Update Available!" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white">
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Download APK Direct URL Link</label>
+                            <input type="text" id="update-download-url" placeholder="https://example.com/keeva-money-v2.apk" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-cyan-400 font-mono">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Update Changelog / Details (What's New)</label>
+                            <textarea id="update-changelog-input" rows="3" placeholder="Explain what is improved or added..." class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white"></textarea>
+                        </div>
+
+                        <div class="flex items-center space-x-3 p-4 rounded-xl bg-slate-950 border border-slate-800">
+                            <input type="checkbox" id="update-force-toggle" class="w-4 h-4 accent-indigo-600 rounded">
+                            <div>
+                                <label for="update-force-toggle" class="text-xs font-bold text-white cursor-pointer">Force Update (Zabardasti Update)</label>
+                                <p class="text-[10px] text-slate-400">User update kiye bina popup ko close nahi kar payega.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3 pt-2">
+                            <button onclick="saveAppUpdateSettings()" class="flex-1 py-3 bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-lg">
+                                Save & Activate Update Popup
+                            </button>
+                            <button onclick="disableAppUpdatePopup()" class="px-6 py-3 bg-slate-800 text-slate-300 font-bold text-xs rounded-xl hover:bg-slate-700">
+                                Turn Off Popup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. PRODUCTS & INVESTMENT PLANS -->
+            <section id="tab-products" class="admin-tab hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-white">Investment Plans & Packages</h3>
+                        <p class="text-xs text-slate-400">Manage pipeline investment plans displayed on user home screen.</p>
+                    </div>
+                    <button onclick="openProductModal()" class="px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 font-extrabold text-xs text-white rounded-xl shadow-md flex items-center space-x-1.5">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add New Plan</span>
+                    </button>
+                </div>
+                <div id="products-grid" class="grid grid-cols-1 md:grid-cols-3 gap-5"></div>
+            </section>
+
+            <!-- 9. PROMO GIFT CODES -->
+            <section id="tab-promos" class="admin-tab hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-white">Gift Promo Codes</h3>
+                        <p class="text-xs text-slate-400">Telegram giveaway promo codes banayein.</p>
+                    </div>
+                    <button onclick="openPromoCreateModal()" class="px-4 py-2.5 bg-gradient-to-r from-pink-500 to-rose-600 font-extrabold text-xs text-white rounded-xl shadow-md flex items-center space-x-1.5">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Generate Promo Code</span>
+                    </button>
+                </div>
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900/80 border-b border-white/10 text-[10px] font-black uppercase text-slate-400 font-mono">
+                                <tr>
+                                    <th class="p-3.5">Promo Code</th>
+                                    <th class="p-3.5">Bonus Reward</th>
+                                    <th class="p-3.5">Usage / Limit</th>
+                                    <th class="p-3.5">Status</th>
+                                    <th class="p-3.5 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="promos-tbody" class="divide-y divide-white/5 font-mono">
+                                <tr><td colspan="5" class="p-6 text-center text-slate-500">Loading codes...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 10. LIVE CHAT SUPPORT CONSOLE -->
+            <section id="tab-support" class="admin-tab hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[600px]">
+                    <div class="glass-panel rounded-2xl p-4 flex flex-col border border-white/10 overflow-hidden">
+                        <h4 class="text-xs font-black uppercase tracking-wider text-slate-400 pb-3 border-b border-white/10">Active Conversations</h4>
+                        <div id="support-chats-list" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 pt-3">
+                            <div class="text-center py-8 text-xs text-slate-500">Loading chats...</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-4 md:col-span-2 flex flex-col border border-white/10 overflow-hidden">
+                        <div id="admin-chat-header" class="pb-3 border-b border-white/10 flex justify-between items-center">
+                            <div>
+                                <h4 id="active-chat-user-name" class="text-xs font-bold text-white">Select a chat to begin</h4>
+                                <p id="active-chat-user-phone" class="text-[10px] text-slate-400 font-mono">No conversation active</p>
+                            </div>
+                        </div>
+
+                        <div id="admin-chat-messages" class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2.5 bg-slate-950/80 my-3 rounded-xl text-xs">
+                            <div class="text-center py-20 text-slate-500">Select any user on the left to review messages & reply.</div>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <input type="text" id="admin-reply-input" onkeypress="if(event.key==='Enter') sendAdminChatReply()" placeholder="Type your reply to user..." class="flex-1 px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500">
+                            <button onclick="sendAdminChatReply()" class="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-teal-500 hover:brightness-110 font-bold text-xs rounded-xl shadow-md text-white flex items-center space-x-1">
+                                <i class="fa-solid fa-paper-plane text-xs"></i>
+                                <span>Send</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 11. PROBLEM TICKETS -->
+            <section id="tab-tickets" class="admin-tab hidden space-y-4">
+                <div>
+                    <h3 class="text-sm font-extrabold text-white">Submitted User Problem Reports</h3>
+                    <p class="text-xs text-slate-400">Review tickets with uploaded screenshots and send instant reply solutions.</p>
+                </div>
+                <div id="tickets-list" class="space-y-4"></div>
+            </section>
+
+            <!-- 12. BANNERS MANAGER -->
+            <section id="tab-banners" class="admin-tab hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-sm font-extrabold text-white">Home Screen Promotional Banners</h3>
+                        <p class="text-xs text-slate-400">Configure sliding banners, target URLs and promotional text.</p>
+                    </div>
+                    <button onclick="openBannerCreateModal()" class="px-4 py-2.5 bg-yellow-500 hover:bg-yellow-600 font-extrabold text-xs text-black rounded-xl shadow-md flex items-center space-x-1.5">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add Banner</span>
+                    </button>
+                </div>
+                <div id="banners-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+            </section>
+
+            <!-- 13. GLOBAL SETTINGS (PAYMENT QR URL, UPI, WITHDRAW LIMITS, TELEGRAM) -->
+            <section id="tab-settings" class="admin-tab hidden space-y-6">
+                <div class="glass-panel p-6 rounded-3xl border border-white/10 space-y-6 max-w-4xl">
+                    <h3 class="text-sm font-extrabold text-white uppercase tracking-wider border-b border-white/10 pb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-sliders text-indigo-400"></i>
+                        <span>Payment QR URL, Gateway & Global Settings</span>
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2 space-y-1 p-3 bg-slate-950 border border-indigo-500/30 rounded-2xl">
+                            <label class="block text-[10px] font-bold text-amber-400 uppercase flex items-center gap-1.5">
+                                <i class="fa-solid fa-qrcode"></i>
+                                <span>Custom Payment QR Code Image URL (पेमेंट QR फोटो लिंक)</span>
+                            </label>
+                            <input type="text" id="setting-qr-url" placeholder="https://i.ibb.co/... or your uploaded QR code image link" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono text-emerald-400">
+                            <p class="text-[10px] text-slate-400">Agar aap direct apna custom QR dikhana chahte hain to yahan image URL paste karein. Khali chhodne par auto-generated QR banega.</p>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">App Name</label>
+                            <input type="text" id="setting-app-name" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Merchant UPI ID</label>
+                            <input type="text" id="setting-upi" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono text-emerald-400">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Min Withdrawal (₹)</label>
+                            <input type="number" id="setting-min-withdraw" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono text-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Max Withdrawal (₹)</label>
+                            <input type="number" id="setting-max-withdraw" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono text-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Withdrawal Fee / Tax (%)</label>
+                            <input type="number" id="setting-withdraw-fee" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono text-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Referral Domain Link</label>
+                            <input type="text" id="setting-ref-domain" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono text-white">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Telegram Channel Link</label>
+                            <input type="text" id="setting-tg-channel" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono text-cyan-400">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Telegram Support Link</label>
+                            <input type="text" id="setting-tg-support" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono text-cyan-400">
+                        </div>
+                    </div>
+
+                    <button onclick="saveAllSettings()" class="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-teal-500 hover:brightness-110 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-lg">
+                        Save Global Configuration
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- APPROVE WITHDRAWAL MODAL (WITH OPTIONAL UTR) -->
+    <div id="modal-approve-withdraw" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-sm w-full p-6 rounded-3xl space-y-4 border border-emerald-500/30">
+            <h3 class="text-sm font-extrabold text-white">Approve Withdrawal</h3>
+            <p class="text-xs text-slate-400">Enter bank transfer UTR number <span class="text-amber-400 font-bold">(Optional)</span>. Agar khali chhodenge to system auto-generate karega.</p>
+            <input type="text" id="approve-utr-input" placeholder="Bank UTR No. (Optional - e.g. 402847291039)" class="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-xs font-mono text-emerald-400 focus:outline-none">
+            <div class="flex gap-2">
+                <button onclick="closeApproveWithdrawModal()" class="flex-1 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancel</button>
+                <button onclick="confirmApproveWithdraw()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl">Approve Now ✓</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REJECT WITHDRAWAL MODAL (WITH OPTIONAL REASON & AUTO REFUND) -->
+    <div id="modal-reject-withdraw" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-sm w-full p-6 rounded-3xl space-y-4 border border-red-500/30">
+            <h3 class="text-sm font-extrabold text-white">Reject Withdrawal & Refund Balance</h3>
+            <p class="text-xs text-slate-400">Enter rejection reason <span class="text-amber-400 font-bold">(Optional)</span>. Amount automatically user wallet me refund ho jayega.</p>
+            <textarea id="reject-reason-input" rows="3" placeholder="Rejection reason (Optional - default: Bank server issue / Details mismatch)" class="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none"></textarea>
+            <div class="flex gap-2">
+                <button onclick="closeRejectWithdrawModal()" class="flex-1 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancel</button>
+                <button onclick="confirmRejectWithdraw()" class="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl">Reject & Refund ✗</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT PENDING WITHDRAWAL DETAILS MODAL -->
+    <div id="modal-edit-withdraw" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-md w-full p-6 rounded-3xl space-y-4 border border-amber-500/30">
+            <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                <h3 class="text-sm font-extrabold text-white">Edit Pending Withdrawal Details</h3>
+                <button onclick="closeEditWithdrawModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 font-mono text-xs">
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-sans font-bold">User Phone</label>
+                    <input type="text" id="edit-w-phone" readonly class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-slate-400">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-sans font-bold">Holder / Beneficiary Name</label>
+                    <input type="text" id="edit-w-holder" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-sans font-bold">Bank Name</label>
+                    <input type="text" id="edit-w-bank" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-sans font-bold">Account Number</label>
+                    <input type="text" id="edit-w-acc" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-sans font-bold">IFSC Code</label>
+                    <input type="text" id="edit-w-ifsc" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-amber-400 font-bold uppercase">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-sans font-bold">Withdrawal Amount (₹)</label>
+                    <input type="number" id="edit-w-amount" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-emerald-400 font-bold">
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeEditWithdrawModal()" class="flex-1 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancel</button>
+                <button onclick="saveWithdrawalEdits()" class="flex-1 py-2.5 bg-amber-600 hover:bg-amber-700 text-black text-xs font-black rounded-xl">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT USER MODAL (WITH DIRECT SUSPEND WITH NOTICE & DELETE) -->
+    <div id="modal-edit-user" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-md w-full p-6 rounded-3xl space-y-4 border border-indigo-500/30">
+            <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                <h3 class="text-sm font-extrabold text-white">Edit User Profile, Balance & Suspend</h3>
+                <button onclick="closeEditUserModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 font-mono text-xs">
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-sans font-bold">User Phone</label>
+                    <input type="text" id="edit-user-phone" readonly class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-slate-400">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-sans font-bold">Full Name</label>
+                    <input type="text" id="edit-user-name" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-sans font-bold">Wallet Balance (₹)</label>
+                    <input type="number" id="edit-user-balance" step="0.01" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-emerald-400 font-bold">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-sans font-bold">Account Password</label>
+                    <input type="text" id="edit-user-password" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-amber-400">
+                </div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-sans font-bold">Account Status</label>
+                    <select id="edit-user-status" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white">
+                        <option value="active">Active (Permitted)</option>
+                        <option value="suspended">Suspended (Blocked with Notice)</option>
+                    </select>
+                </div>
+                <div id="suspend-reason-box" class="space-y-1">
+                    <label class="block text-[10px] text-red-400 uppercase font-sans font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Suspension Notice (User Screen par dikhega)</span>
+                    </label>
+                    <textarea id="edit-user-suspend-reason" rows="2" placeholder="e.g. Account suspended due to suspicious activity. Contact support." class="w-full px-3 py-2 bg-slate-950 border border-red-500/30 rounded-xl text-red-300"></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="deleteCurrentUser()" class="px-3 py-2.5 bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 text-xs font-bold rounded-xl flex items-center gap-1.5">
+                    <i class="fa-solid fa-trash"></i>
+                    <span>Delete</span>
+                </button>
+                <button onclick="closeEditUserModal()" class="flex-1 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancel</button>
+                <button onclick="saveUserChanges()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl">Save & Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT NOTIFICATION MODAL -->
+    <div id="modal-edit-notif" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-md w-full p-6 rounded-3xl space-y-4 border border-amber-500/30">
+            <h3 class="text-sm font-extrabold text-white">Edit Notification</h3>
+            <div class="space-y-3 text-xs">
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Title</label>
+                    <input type="text" id="edit-notif-title" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Message</label>
+                    <textarea id="edit-notif-msg" rows="3" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white"></textarea>
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeEditNotifModal()" class="flex-1 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancel</button>
+                <button onclick="saveNotificationEdits()" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-black text-xs font-black rounded-xl">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD/EDIT PRODUCT MODAL -->
+    <div id="modal-product" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-md w-full p-6 rounded-3xl space-y-4 border border-purple-500/30">
+            <h3 class="text-sm font-extrabold text-white" id="product-modal-title">Create Investment Pipeline</h3>
+            <div class="space-y-3 text-xs">
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Pipeline Name</label>
+                    <input type="text" id="prod-name" placeholder="e.g. Solar Farm Beta 01" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white">
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Price (₹)</label>
+                        <input type="number" id="prod-price" placeholder="500" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white font-mono">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Daily (₹)</label>
+                        <input type="number" id="prod-daily" placeholder="50" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-emerald-400 font-mono">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Days</label>
+                        <input type="number" id="prod-term" placeholder="30" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white font-mono">
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Image URL</label>
+                    <input type="text" id="prod-image" placeholder="https://..." class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-300 font-mono">
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeProductModal()" class="flex-1 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancel</button>
+                <button onclick="saveProduct()" class="flex-1 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl">Save Pipeline</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREATE PROMO CODE MODAL -->
+    <div id="modal-promo" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-md w-full p-6 rounded-3xl space-y-4 border border-pink-500/30">
+            <h3 class="text-sm font-extrabold text-white">Generate Telegram Gift Promo Code</h3>
+            <div class="space-y-3 text-xs">
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Promo Code Text</label>
+                    <input type="text" id="promo-code-input" placeholder="e.g. MEGA100" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-amber-400 font-mono font-bold uppercase">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Reward Amount (₹)</label>
+                        <input type="number" id="promo-reward-input" placeholder="100" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-emerald-400 font-mono font-bold">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Max User Claims</label>
+                        <input type="number" id="promo-limit-input" placeholder="50" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white font-mono">
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="closePromoCreateModal()" class="flex-1 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancel</button>
+                <button onclick="savePromoCode()" class="flex-1 py-2.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-bold rounded-xl">Publish Code</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREATE BANNER MODAL -->
+    <div id="modal-banner" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-md w-full p-6 rounded-3xl space-y-4 border border-yellow-500/30">
+            <h3 class="text-sm font-extrabold text-white">Create Home Screen Banner</h3>
+            <div class="space-y-3 text-xs">
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Tag / Category</label>
+                    <input type="text" id="banner-tag" placeholder="e.g. VIP BONUS" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Banner Headline</label>
+                    <input type="text" id="banner-title" placeholder="e.g. 50% Extra On First Deposit" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Subtitle Description</label>
+                    <input type="text" id="banner-subtitle" placeholder="Short description..." class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Image URL</label>
+                    <input type="text" id="banner-image" placeholder="https://..." class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white font-mono">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Click / Redirect URL (Optional)</label>
+                    <input type="text" id="banner-link" placeholder="https://t.me/..." class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-white font-mono">
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeBannerModal()" class="flex-1 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancel</button>
+                <button onclick="saveBanner()" class="flex-1 py-2.5 bg-yellow-500 hover:bg-yellow-600 text-black text-xs font-bold rounded-xl">Save Banner</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TICKET REPLY MODAL -->
+    <div id="modal-ticket-reply" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-panel max-w-md w-full p-6 rounded-3xl space-y-4 border border-indigo-500/30">
+            <h3 class="text-sm font-extrabold text-white">Send Solution / Reply to User</h3>
+            <div class="space-y-2">
+                <p id="ticket-reply-summary" class="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800"></p>
+                <textarea id="ticket-reply-text" rows="4" placeholder="Enter solution details for the user..." class="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none"></textarea>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeTicketReplyModal()" class="flex-1 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancel</button>
+                <button onclick="submitTicketReply()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl">Send & Resolve ✓</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SCRIPT ENGINE ==================== -->
+    <script>
+        // FIREBASE SETUP
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_MQamtsnuPIpAxkP-lITX7r4E975G5h4",
+            authDomain: "my-app-ea99c.firebaseapp.com",
+            databaseURL: "https://my-app-ea99c-default-rtdb.firebaseio.com",
+            projectId: "my-app-ea99c",
+            storageBucket: "my-app-ea99c.firebasestorage.app",
+            messagingSenderId: "1080187627232",
+            appId: "1:1080187627232:web:526835ce3e0bd01be49285",
+            measurementId: "G-6WTG33XMPT"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // IN-MEMORY CACHE
+        let usersData = {};
+        let withdrawalsData = {};
+        let depositsData = {};
+        let productsData = [];
+        let bannersData = [];
+        let promoCodesData = {};
+        let supportChatsData = {};
+        let problemTicketsData = {};
+        let settingsData = {};
+        let notificationsData = {};
+
+        let currentActiveChatUser = null;
+        let selectedWithdrawalKey = null;
+        let selectedTicketKey = null;
+        let selectedTicketPhone = null;
+        let selectedNotifKey = null;
+        let isAviatorKillModeActive = false;
+
+        // TAB SWITCHER
+        function switchTab(tabId) {
+            document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+            const targetSection = document.getElementById(`tab-${tabId}`);
+            const targetNav = document.getElementById(`nav-${tabId}`);
+            if (targetSection) targetSection.classList.remove('hidden');
+            if (targetNav) targetNav.classList.add('active');
+
+            const titleMap = {
+                dashboard: ['Dashboard Overview', 'Real-time statistics & global app control.'],
+                withdrawals: ['Withdrawals Control Desk', 'Pending withdrawals approve karein (UTR Optional) ya reject karein (Reason Optional).'],
+                deposits: ['Deposit Verifications', 'Verify 12-digit UTR references & credit balances.'],
+                users: ['User Accounts & 1-Click Management', 'Search users, edit balance, suspend with notice, 1-Click Delete All & 1-Click Recover All.'],
+                aviator: ['Aviator Master Rig', 'Auto mode, Fixed multiplier ya Kisi bhi user ke bet par 1x auto crash.'],
+                notifications: ['Notification Manager', 'View all broadcasts, edit messages, delete single ya all notifications.'],
+                'update-popup': ['App Update Popup Controller', 'Version, download link, changelog & force update configuration.'],
+                products: ['Investment Packages', 'Add, modify, or remove product pipeline plans.'],
+                promos: ['Promo Giveaway Codes', 'Create promo codes for Telegram channel drops.'],
+                support: ['Live Chat Console', 'Chat directly with users in real-time.'],
+                tickets: ['Problem Desk Tickets', 'Review customer issues and attachments with solutions.'],
+                banners: ['Banner Management', 'Set sliding promo banners & go-links.'],
+                settings: ['Payment QR, UPI & Global Config', 'Custom QR URL, UPI gateway, withdrawal limits & links.']
+            };
+
+            if (titleMap[tabId]) {
+                document.getElementById('section-title').innerText = titleMap[tabId][0];
+                document.getElementById('section-subtitle').innerText = titleMap[tabId][1];
+            }
+        }
+
+        // --- REAL-TIME LISTENERS ---
+        function initRealtimeListeners() {
+            // USERS
+            database.ref('users').on('value', snapshot => {
+                usersData = snapshot.val() || {};
+                renderUsersTable();
+                updateDashboardStats();
+            });
+
+            // CHECK RECOVER BACKUP STATUS
+            database.ref('users_backup').on('value', snapshot => {
+                const bCount = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
+                const statusEl = document.getElementById('user-backup-status-text');
+                if (statusEl) {
+                    if (bCount > 0) {
+                        statusEl.innerText = `Backup Available: ${bCount} Users (Ready to Recover)`;
+                        statusEl.className = "text-[11px] font-mono text-emerald-400 block font-bold";
+                    } else {
+                        statusEl.innerText = "No Backup Found";
+                        statusEl.className = "text-[11px] font-mono text-slate-500 block";
+                    }
+                }
+            });
+
+            // WITHDRAWALS
+            database.ref('withdrawals').on('value', snapshot => {
+                withdrawalsData = snapshot.val() || {};
+                renderWithdrawalsTable();
+                updateDashboardStats();
+            });
+
+            // DEPOSITS
+            database.ref('deposits').on('value', snapshot => {
+                depositsData = snapshot.val() || {};
+                renderDepositsTable();
+                updateDashboardStats();
+            });
+
+            // PRODUCTS
+            database.ref('products').on('value', snapshot => {
+                const val = snapshot.val();
+                productsData = val ? (Array.isArray(val) ? val.filter(Boolean) : Object.values(val)) : [];
+                renderProductsGrid();
+            });
+
+            // BANNERS
+            database.ref('settings/banners').on('value', snapshot => {
+                bannersData = snapshot.val() || [];
+                renderBannersGrid();
+            });
+
+            // PROMO CODES
+            database.ref('promoCodes').on('value', snapshot => {
+                promoCodesData = snapshot.val() || {};
+                renderPromoCodesTable();
+            });
+
+            // NOTIFICATIONS
+            database.ref('notifications').on('value', snapshot => {
+                notificationsData = snapshot.val() || {};
+                renderNotificationsList();
+            });
+
+            // LIVE CHATS
+            database.ref('supportChats').on('value', snapshot => {
+                supportChatsData = snapshot.val() || {};
+                renderSupportChatsList();
+            });
+
+            // PROBLEM TICKETS
+            database.ref('problemTickets').on('value', snapshot => {
+                problemTicketsData = snapshot.val() || {};
+                renderProblemTickets();
+                updateDashboardStats();
+            });
+
+            // SETTINGS & APP UPDATE
+            database.ref('settings').on('value', snapshot => {
+                settingsData = snapshot.val() || {};
+                populateSettingsInputs();
+                populateAppUpdateInputs();
+            });
+
+            // AVIATOR FORCED CRASH & KILL MODE
+            database.ref('settings/aviator').on('value', snapshot => {
+                const val = snapshot.val() || {};
+                isAviatorKillModeActive = val.killMode === true || val.killOnBet === true;
+                updateAviatorRigUI(val);
+            });
+        }
+
+        // --- DASHBOARD STATS ---
+        function updateDashboardStats() {
+            const userList = Object.values(usersData);
+            document.getElementById('stat-total-users').innerText = userList.length;
+
+            let totalBal = 0;
+            userList.forEach(u => totalBal += (parseFloat(u.balance) || 0));
+            document.getElementById('stat-total-balance').innerText = `₹${totalBal.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+
+            const pendingWithdrawals = Object.values(withdrawalsData).filter(w => w.status === 'pending').length;
+            document.getElementById('stat-pending-withdrawals').innerText = pendingWithdrawals;
+            const wBadge = document.getElementById('badge-withdrawals');
+            if (pendingWithdrawals > 0) {
+                wBadge.innerText = pendingWithdrawals;
+                wBadge.classList.remove('hidden');
+            } else {
+                wBadge.classList.add('hidden');
+            }
+
+            const pendingDeposits = Object.values(depositsData).filter(d => d.status === 'pending').length;
+            document.getElementById('stat-pending-deposits').innerText = pendingDeposits;
+            const dBadge = document.getElementById('badge-deposits');
+            if (pendingDeposits > 0) {
+                dBadge.innerText = pendingDeposits;
+                dBadge.classList.remove('hidden');
+            } else {
+                dBadge.classList.add('hidden');
+            }
+
+            const pendingTickets = Object.values(problemTicketsData).filter(t => t.status === 'pending').length;
+            const tBadge = document.getElementById('badge-tickets');
+            if (pendingTickets > 0) {
+                tBadge.innerText = pendingTickets;
+                tBadge.classList.remove('hidden');
+            } else {
+                tBadge.classList.add('hidden');
+            }
+        }
+
+        // --- WITHDRAWALS TABLE, EDIT PENDING & ACTIONS ---
+        let currentWithdrawalFilter = 'all';
+
+        function filterWithdrawals(filter) {
+            currentWithdrawalFilter = filter;
+            renderWithdrawalsTable();
+        }
+
+        function renderWithdrawalsTable() {
+            const tbody = document.getElementById('withdrawals-tbody');
+            if (!tbody) return;
+
+            const entries = Object.keys(withdrawalsData).map(k => ({ key: k, ...withdrawalsData[k] })).reverse();
+            const filtered = entries.filter(w => {
+                if (currentWithdrawalFilter === 'pending') return w.status === 'pending';
+                if (currentWithdrawalFilter === 'approved') return w.status === 'approved' || w.status === 'success';
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 font-sans">No withdrawal records matching filter.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(w => {
+                const isPending = w.status === 'pending';
+                const isApproved = w.status === 'approved' || w.status === 'success';
+                const statusBadge = isPending 
+                    ? `<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold">Pending</span>`
+                    : isApproved 
+                        ? `<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">Approved ✓</span>`
+                        : `<span class="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-bold">Rejected ✗</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-900/50 transition-colors">
+                        <td class="p-3.5">
+                            <span class="font-bold text-white block">${w.name || 'User'}</span>
+                            <span class="text-slate-400 text-[10px]">${w.phone}</span>
+                            ${w.holder ? `<span class="text-[9px] text-cyan-400 block font-mono">Holder: ${w.holder}</span>` : ''}
+                        </td>
+                        <td class="p-3.5">
+                            <span class="text-slate-300 block font-sans">${w.bankName}</span>
+                            <span class="text-slate-400 text-[10px]">A/C: ${w.accNo} | IFSC: ${w.ifsc}</span>
+                        </td>
+                        <td class="p-3.5 font-bold text-white">₹${parseFloat(w.amount).toLocaleString('en-IN')}</td>
+                        <td class="p-3.5">${statusBadge}</td>
+                        <td class="p-3.5 text-slate-400 text-[10px]">${w.date || '-'}</td>
+                        <td class="p-3.5 text-right font-sans">
+                            <div class="flex justify-end gap-1.5 flex-wrap">
+                                ${isPending ? `
+                                    <button onclick="openEditWithdrawModal('${w.key}')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-black rounded-lg text-[10px] font-bold" title="Edit Pending Details">Edit</button>
+                                    <button onclick="openApproveWithdrawModal('${w.key}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold">Approve</button>
+                                    <button onclick="openRejectWithdrawModal('${w.key}', '${w.phone}', ${w.amount})" class="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-[10px] font-bold">Reject</button>
+                                ` : `
+                                    <span class="text-[10px] text-slate-500 font-mono self-center mr-2">${w.approvedUtr || w.rejectReason || 'Processed'}</span>
+                                `}
+                                <button onclick="deleteWithdrawalRecord('${w.key}')" class="px-2 py-1 bg-slate-800 hover:bg-red-900/60 text-slate-400 hover:text-red-300 rounded-lg text-[10px]" title="Delete Record">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openEditWithdrawModal(key) {
+            const w = withdrawalsData[key];
+            if (!w) return;
+            selectedWithdrawalKey = key;
+
+            document.getElementById('edit-w-phone').value = w.phone || '';
+            document.getElementById('edit-w-holder').value = w.holder || w.name || '';
+            document.getElementById('edit-w-bank').value = w.bankName || '';
+            document.getElementById('edit-w-acc').value = w.accNo || '';
+            document.getElementById('edit-w-ifsc').value = w.ifsc || '';
+            document.getElementById('edit-w-amount').value = w.amount || 0;
+
+            document.getElementById('modal-edit-withdraw').classList.remove('hidden');
+        }
+
+        function closeEditWithdrawModal() {
+            document.getElementById('modal-edit-withdraw').classList.add('hidden');
+            selectedWithdrawalKey = null;
+        }
+
+        function saveWithdrawalEdits() {
+            if (!selectedWithdrawalKey) return;
+            const holder = document.getElementById('edit-w-holder').value.trim();
+            const bankName = document.getElementById('edit-w-bank').value.trim();
+            const accNo = document.getElementById('edit-w-acc').value.trim();
+            const ifsc = document.getElementById('edit-w-ifsc').value.trim().toUpperCase();
+            const amount = parseFloat(document.getElementById('edit-w-amount').value) || 0;
+
+            if (!bankName || !accNo || !ifsc || amount <= 0) {
+                alert("Please fill all valid bank and amount details.");
+                return;
+            }
+
+            database.ref(`withdrawals/${selectedWithdrawalKey}`).update({
+                holder,
+                bankName,
+                accNo,
+                ifsc,
+                amount
+            }).then(() => {
+                closeEditWithdrawModal();
+                alert("Pending withdrawal details updated successfully!");
+            });
+        }
+
+        function deleteWithdrawalRecord(key) {
+            if (!confirm("Are you sure you want to permanently delete this withdrawal record?")) return;
+            database.ref(`withdrawals/${key}`).remove().then(() => {
+                alert("Withdrawal record removed.");
+            });
+        }
+
+        function openApproveWithdrawModal(key) {
+            selectedWithdrawalKey = key;
+            document.getElementById('approve-utr-input').value = "";
+            document.getElementById('modal-approve-withdraw').classList.remove('hidden');
+        }
+        function closeApproveWithdrawModal() {
+            document.getElementById('modal-approve-withdraw').classList.add('hidden');
+            selectedWithdrawalKey = null;
+        }
+
+        // WITHDRAWAL APPROVED WITH OPTIONAL UTR
+        function confirmApproveWithdraw() {
+            if (!selectedWithdrawalKey) return;
+            const enteredUtr = document.getElementById('approve-utr-input').value.trim();
+            // If empty, auto-generate standard bank UTR
+            const utr = enteredUtr || ("UTR" + Math.floor(100000000000 + Math.random() * 900000000000));
+            
+            database.ref(`withdrawals/${selectedWithdrawalKey}`).update({
+                status: 'approved',
+                approvedUtr: utr
+            }).then(() => {
+                closeApproveWithdrawModal();
+                alert(`Withdrawal APPROVED successfully! UTR Ref: ${utr}`);
+            });
+        }
+
+        let rejectTarget = null;
+        function openRejectWithdrawModal(key, phone, amount) {
+            rejectTarget = { key, phone, amount };
+            document.getElementById('reject-reason-input').value = "";
+            document.getElementById('modal-reject-withdraw').classList.remove('hidden');
+        }
+        function closeRejectWithdrawModal() {
+            document.getElementById('modal-reject-withdraw').classList.add('hidden');
+            rejectTarget = null;
+        }
+
+        // WITHDRAWAL REJECTED WITH OPTIONAL REASON & AUTO REFUND
+        function confirmRejectWithdraw() {
+            if (!rejectTarget) return;
+            const enteredReason = document.getElementById('reject-reason-input').value.trim();
+            const reason = enteredReason || "Bank server issue / Account details mismatch";
+
+            // Refund balance to user
+            database.ref(`users/${rejectTarget.phone}`).once('value', snapshot => {
+                if (snapshot.exists()) {
+                    const u = snapshot.val();
+                    const newBal = (parseFloat(u.balance) || 0) + parseFloat(rejectTarget.amount);
+                    let ledger = u.ledgerLogs || [];
+                    const dateStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                    ledger.unshift({ title: `Withdrawal Refunded (${reason})`, amount: rejectTarget.amount, type: 'plus', date: dateStr });
+
+                    database.ref(`users/${rejectTarget.phone}`).update({ balance: newBal, ledgerLogs: ledger });
+                }
+
+                database.ref(`withdrawals/${rejectTarget.key}`).update({
+                    status: 'rejected',
+                    rejectReason: reason
+                }).then(() => {
+                    closeRejectWithdrawModal();
+                    alert(`Withdrawal rejected! Amount ₹${rejectTarget.amount} refunded to user wallet with reason: "${reason}"`);
+                });
+            });
+        }
+
+        // --- DEPOSITS MANAGEMENT ---
+        function renderDepositsTable() {
+            const tbody = document.getElementById('deposits-tbody');
+            if (!tbody) return;
+
+            const entries = Object.keys(depositsData).map(k => ({ key: k, ...depositsData[k] })).reverse();
+            if (entries.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 font-sans">No deposit submissions found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = entries.map(d => {
+                const isPending = d.status === 'pending';
+                const isApproved = d.status === 'approved';
+                const statusBadge = isPending 
+                    ? `<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold">Pending Review</span>`
+                    : isApproved 
+                        ? `<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">Credited ✓</span>`
+                        : `<span class="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-bold">Rejected ✗</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-900/50 transition-colors">
+                        <td class="p-3.5">
+                            <span class="font-bold text-white block">${d.name || 'User'}</span>
+                            <span class="text-slate-400 text-[10px]">${d.phone}</span>
+                        </td>
+                        <td class="p-3.5 text-amber-400 font-bold">${d.utr}</td>
+                        <td class="p-3.5 font-bold text-white">₹${parseFloat(d.amount).toLocaleString('en-IN')}</td>
+                        <td class="p-3.5">${statusBadge}</td>
+                        <td class="p-3.5 text-slate-400 text-[10px]">${d.date || '-'}</td>
+                        <td class="p-3.5 text-right font-sans">
+                            ${isPending ? `
+                                <div class="flex justify-end gap-1.5">
+                                    <button onclick="approveDeposit('${d.key}', '${d.phone}', ${d.amount}, '${d.utr}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold">Approve & Credit</button>
+                                    <button onclick="rejectDeposit('${d.key}')" class="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-[10px] font-bold">Reject</button>
+                                </div>
+                            ` : `<span class="text-[10px] text-slate-500 font-mono">${d.status}</span>`}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function approveDeposit(key, phone, amount, utr) {
+            if (!confirm(`Credit ₹${amount} to user ${phone}?`)) return;
+
+            database.ref(`users/${phone}`).once('value', snapshot => {
+                if (snapshot.exists()) {
+                    const u = snapshot.val();
+                    const newBal = (parseFloat(u.balance) || 0) + parseFloat(amount);
+                    let ledger = u.ledgerLogs || [];
+                    const dateStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                    ledger.unshift({ title: `Deposit Approved (UTR: ${utr})`, amount: amount, type: 'plus', date: dateStr });
+
+                    database.ref(`users/${phone}`).update({ balance: newBal, ledgerLogs: ledger });
+                }
+
+                database.ref(`deposits/${key}`).update({ status: 'approved' }).then(() => {
+                    alert(`₹${amount} successfully added to ${phone}'s wallet!`);
+                });
+            });
+        }
+
+        function rejectDeposit(key) {
+            if (!confirm("Reject this deposit request?")) return;
+            database.ref(`deposits/${key}`).update({ status: 'rejected' }).then(() => {
+                alert("Deposit request rejected.");
+            });
+        }
+
+        // --- USERS MANAGEMENT: SUSPEND WITH NOTICE, 1-CLICK DELETE ALL, 1-CLICK RECOVER ALL ---
+        function renderUsersTable(customList = null) {
+            const tbody = document.getElementById('users-tbody');
+            if (!tbody) return;
+
+            const list = customList || Object.values(usersData);
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 font-sans">No users found. (Click "1-Click Recover All" if recently deleted)</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(u => {
+                const isSuspended = u.status === 'suspended';
+                return `
+                    <tr class="hover:bg-slate-900/50 transition-colors">
+                        <td class="p-3.5 font-mono">
+                            <span class="font-bold text-white block">${u.name || 'Unnamed'}</span>
+                            <span class="text-slate-400 text-[10px]">${u.phone}</span>
+                            ${isSuspended && u.suspendReason ? `<span class="text-[9px] text-red-400 block font-sans truncate max-w-xs">Notice: ${u.suspendReason}</span>` : ''}
+                        </td>
+                        <td class="p-3.5 font-mono text-amber-400 font-bold">${u.password || '******'}</td>
+                        <td class="p-3.5 font-mono font-extrabold text-emerald-400">₹${(parseFloat(u.balance) || 0).toLocaleString('en-IN', {minimumFractionDigits: 2})}</td>
+                        <td class="p-3.5 font-mono text-slate-300">${u.referralsCount || 0}</td>
+                        <td class="p-3.5">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isSuspended ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}">
+                                ${isSuspended ? 'Suspended' : 'Active'}
+                            </span>
+                        </td>
+                        <td class="p-3.5 text-right font-sans">
+                            <div class="flex justify-end gap-1.5">
+                                <button onclick="openEditUserModal('${u.phone}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[10px] font-bold">Edit / Suspend</button>
+                                <button onclick="quickAddBalance('${u.phone}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold">+ ₹</button>
+                                <button onclick="deleteDirectUser('${u.phone}')" class="px-2.5 py-1 bg-red-600/20 hover:bg-red-600/40 text-red-400 border border-red-500/30 rounded-lg text-[10px] font-bold" title="Delete User">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function searchUsers() {
+            const query = document.getElementById('user-search-input').value.trim().toLowerCase();
+            if (!query) {
+                renderUsersTable();
+                return;
+            }
+            const filtered = Object.values(usersData).filter(u => 
+                (u.phone && u.phone.toLowerCase().includes(query)) ||
+                (u.name && u.name.toLowerCase().includes(query))
+            );
+            renderUsersTable(filtered);
+        }
+
+        function quickAddBalance(phone) {
+            const amtStr = prompt(`Enter amount to ADD to wallet for ${phone}:`, "500");
+            if (!amtStr) return;
+            const amt = parseFloat(amtStr);
+            if (isNaN(amt) || amt <= 0) { alert("Invalid amount."); return; }
+
+            const u = usersData[phone];
+            if (!u) return;
+
+            const newBal = (parseFloat(u.balance) || 0) + amt;
+            let ledger = u.ledgerLogs || [];
+            const dateStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            ledger.unshift({ title: "Admin Added Balance", amount: amt, type: 'plus', date: dateStr });
+
+            database.ref(`users/${phone}`).update({ balance: newBal, ledgerLogs: ledger }).then(() => {
+                alert(`Added ₹${amt} to ${phone}'s wallet!`);
+            });
+        }
+
+        function openEditUserModal(phone) {
+            const u = usersData[phone];
+            if (!u) return;
+
+            document.getElementById('edit-user-phone').value = u.phone;
+            document.getElementById('edit-user-name').value = u.name || '';
+            document.getElementById('edit-user-balance').value = u.balance || 0;
+            document.getElementById('edit-user-password').value = u.password || '';
+            document.getElementById('edit-user-status').value = u.status || 'active';
+            document.getElementById('edit-user-suspend-reason').value = u.suspendReason || 'Account suspended by administrator for verification.';
+
+            document.getElementById('modal-edit-user').classList.remove('hidden');
+        }
+
+        function closeEditUserModal() {
+            document.getElementById('modal-edit-user').classList.add('hidden');
+        }
+
+        // USER SUSPENDED WITH NOTICE
+        function saveUserChanges() {
+            const phone = document.getElementById('edit-user-phone').value;
+            const name = document.getElementById('edit-user-name').value.trim();
+            const balance = parseFloat(document.getElementById('edit-user-balance').value) || 0;
+            const password = document.getElementById('edit-user-password').value.trim();
+            const status = document.getElementById('edit-user-status').value;
+            const enteredReason = document.getElementById('edit-user-suspend-reason').value.trim();
+            const suspendReason = status === 'suspended' ? (enteredReason || "Account suspended by administrator.") : "";
+
+            database.ref(`users/${phone}`).update({
+                name,
+                balance,
+                password,
+                status,
+                suspendReason
+            }).then(() => {
+                closeEditUserModal();
+                alert(status === 'suspended' 
+                    ? `User ${phone} ko SUSPEND kar diya gaya hai! Notice: "${suspendReason}" uski screen par turant dikhega.` 
+                    : `User ${phone} updated successfully!`);
+            });
+        }
+
+        function deleteCurrentUser() {
+            const phone = document.getElementById('edit-user-phone').value;
+            deleteDirectUser(phone);
+        }
+
+        function deleteDirectUser(phone) {
+            if (!phone) return;
+            if (confirm(`ARE YOU SURE you want to permanently DELETE user ${phone}?`)) {
+                // Keep backup copy of this single user in users_backup as well
+                database.ref(`users/${phone}`).once('value', snap => {
+                    if (snap.exists()) {
+                        database.ref(`users_backup/${phone}`).set(snap.val());
+                    }
+                });
+
+                database.ref(`users/${phone}`).remove().then(() => {
+                    closeEditUserModal();
+                    alert(`User ${phone} deleted! (Backed up in recovery storage)`);
+                });
+            }
+        }
+
+        // 1-CLICK DELETE ALL USERS (AUTOMATIC BACKUP CREATED BEFORE DELETE)
+        function executeOneClickDeleteAllUsers() {
+            const allCount = Object.keys(usersData).length;
+            if (allCount === 0) {
+                alert("Database me koi bhi user nahi hai.");
+                return;
+            }
+
+            const promptCode = prompt(`⚠️ WARNING: Kya aap sach me sabhi (${allCount}) USERS ko DELETE karna chahte hain?\n\nType 'DELETE ALL' to confirm:`);
+            if (promptCode !== 'DELETE ALL') {
+                alert("Deletion Cancelled!");
+                return;
+            }
+
+            // Step 1: Backup all users automatically to 'users_backup'
+            database.ref('users_backup').set(usersData).then(() => {
+                // Step 2: Delete from users/
+                database.ref('users').remove().then(() => {
+                    alert(`✅ Sabhi ${allCount} Users delete kar diye gaye hain!\n\nNote: Ek secure backup 'users_backup' me save ho chuka hai. Agar aapko wapas laane ho to '1-Click Recover All' dabayein!`);
+                });
+            });
+        }
+
+        // 1-CLICK RECOVER ALL USERS (RESTORES FROM BACKUP)
+        function executeOneClickRecoverAllUsers() {
+            database.ref('users_backup').once('value', snapshot => {
+                if (!snapshot.exists() || Object.keys(snapshot.val()).length === 0) {
+                    alert("Koi recovery backup nahi mila! Pehle se koi deleted backup available nahi hai.");
+                    return;
+                }
+
+                const backupUsers = snapshot.val();
+                const count = Object.keys(backupUsers).length;
+
+                if (!confirm(`Found ${count} deleted users in backup storage!\n\nKya aap in sabhi ${count} users ko wapas database me RECOVER / RESTORE karna chahte hain?`)) return;
+
+                // Merge / Restore backup users into 'users'
+                database.ref('users').update(backupUsers).then(() => {
+                    alert(`🎉 SUCCESS! Sabhi ${count} Users successfully RECOVER ho gaye hain!`);
+                }).catch(err => {
+                    alert("Recovery failed: " + err.message);
+                });
+            });
+        }
+
+        // --- AVIATOR RIG: AUTO / FIX / KILL-ON-BET MODES ---
+        function updateAviatorRigUI(aviatorConfig) {
+            const modeLabel = document.getElementById('aviator-active-mode-label');
+            const crashDisplay = document.getElementById('current-forced-crash-display');
+            const killBadge = document.getElementById('kill-mode-status-badge');
+            const killBtn = document.getElementById('toggle-kill-mode-btn');
+            const killActiveLabel = document.getElementById('aviator-kill-active-label');
+
+            if (isAviatorKillModeActive) {
+                killBadge.innerText = "ACTIVE (KILL ON BET)";
+                killBadge.className = "px-3 py-1 rounded-full text-xs font-black uppercase font-mono bg-red-600 text-white animate-pulse";
+                killBtn.innerText = "Disable Kill Mode";
+                killBtn.className = "px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-extrabold text-xs uppercase tracking-wider rounded-xl";
+                killActiveLabel.innerText = "Enabled (Plane will crash <= 1.02x)";
+                killActiveLabel.className = "text-red-400 font-black";
+                modeLabel.innerText = "KILL MODE (Crash at 1x on bet)";
+                modeLabel.className = "text-red-400 font-black";
+            } else {
+                killBadge.innerText = "OFF";
+                killBadge.className = "px-3 py-1 rounded-full text-xs font-black uppercase font-mono bg-slate-800 text-slate-400";
+                killBtn.innerText = "Enable Kill Mode";
+                killBtn.className = "px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-lg";
+                killActiveLabel.innerText = "Disabled";
+                killActiveLabel.className = "text-slate-400";
+
+                if (aviatorConfig.forcedCrashPoint) {
+                    modeLabel.innerText = "FIXED MULTIPLIER OVERRIDE";
+                    modeLabel.className = "text-amber-400 font-bold";
+                } else {
+                    modeLabel.innerText = "Random Auto RNG";
+                    modeLabel.className = "text-emerald-400 font-bold";
+                }
+            }
+
+            if (aviatorConfig.forcedCrashPoint) {
+                crashDisplay.innerText = `${aviatorConfig.forcedCrashPoint}x`;
+                crashDisplay.className = "text-red-400 font-extrabold";
+            } else {
+                crashDisplay.innerText = "None (Auto)";
+                crashDisplay.className = "text-amber-400";
+            }
+        }
+
+        function toggleAviatorKillMode() {
+            const nextState = !isAviatorKillModeActive;
+            database.ref('settings/aviator').update({
+                killMode: nextState,
+                killOnBet: nextState,
+                forcedCrashPoint: nextState ? 1.01 : null
+            }).then(() => {
+                alert(nextState 
+                    ? "KILL MODE ACTIVATED! Kisi bhi user ke bet lagate hi plane 1.01x par turant crash hoga." 
+                    : "Kill mode disabled. Game back to normal.");
+            });
+        }
+
+        function setForcedAviatorCrash() {
+            const val = parseFloat(document.getElementById('forced-aviator-input').value);
+            if (isNaN(val) || val <= 1.0) { alert("Please enter valid multiplier greater than 1.00"); return; }
+            database.ref('settings/aviator').update({
+                forcedCrashPoint: val,
+                killMode: false,
+                killOnBet: false
+            }).then(() => {
+                alert(`Fixed crash point set to ${val}x!`);
+            });
+        }
+
+        function setQuickAviatorCrash(val) {
+            database.ref('settings/aviator').update({
+                forcedCrashPoint: val,
+                killMode: false,
+                killOnBet: false
+            }).then(() => {
+                alert(`Quick crash point set to ${val}x!`);
+            });
+        }
+
+        function clearAviatorCrashOverride() {
+            database.ref('settings/aviator').update({
+                forcedCrashPoint: null,
+                killMode: false,
+                killOnBet: false
+            }).then(() => {
+                alert("Game set to RANDOM AUTO RNG Mode.");
+            });
+        }
+
+        // --- NOTIFICATIONS: VIEW / EDIT / DELETE / CLEAR ALL ---
+        function renderNotificationsList() {
+            const container = document.getElementById('notifications-list');
+            if (!container) return;
+
+            const entries = Object.keys(notificationsData).map(k => ({ key: k, ...notificationsData[k] })).reverse();
+            if (entries.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-slate-500 font-mono glass-panel rounded-2xl">No notifications active.</div>`;
+                return;
+            }
+
+            container.innerHTML = entries.map(n => `
+                <div class="glass-panel p-4 rounded-2xl border border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                    <div class="space-y-1 flex-1">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-bold text-white">${n.title || 'Announcement'}</span>
+                            <span class="text-[9px] text-slate-400 font-mono">• ${n.date || 'Live'}</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">${n.message || ''}</p>
+                    </div>
+                    <div class="flex gap-2 shrink-0">
+                        <button onclick="openEditNotifModal('${n.key}')" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-bold rounded-xl">
+                            Edit
+                        </button>
+                        <button onclick="deleteNotification('${n.key}')" class="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 text-xs font-bold rounded-xl">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function publishNewNotification() {
+            const title = document.getElementById('notif-title-input').value.trim();
+            const message = document.getElementById('notif-message-input').value.trim();
+            const date = document.getElementById('notif-date-input').value.trim() || new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+            if (!title || !message) { alert("Please enter both Title and Message."); return; }
+
+            database.ref('notifications').push({
+                title,
+                message,
+                date,
+                timestamp: Date.now()
+            }).then(() => {
+                document.getElementById('notif-title-input').value = '';
+                document.getElementById('notif-message-input').value = '';
+                document.getElementById('notif-date-input').value = '';
+                alert("Notification broadcasted successfully!");
+            });
+        }
+
+        function openEditNotifModal(key) {
+            const n = notificationsData[key];
+            if (!n) return;
+            selectedNotifKey = key;
+            document.getElementById('edit-notif-title').value = n.title || '';
+            document.getElementById('edit-notif-msg').value = n.message || '';
+            document.getElementById('modal-edit-notif').classList.remove('hidden');
+        }
+
+        function closeEditNotifModal() {
+            document.getElementById('modal-edit-notif').classList.add('hidden');
+            selectedNotifKey = null;
+        }
+
+        function saveNotificationEdits() {
+            if (!selectedNotifKey) return;
+            const title = document.getElementById('edit-notif-title').value.trim();
+            const message = document.getElementById('edit-notif-msg').value.trim();
+
+            if (!title || !message) { alert("Title and Message cannot be empty."); return; }
+
+            database.ref(`notifications/${selectedNotifKey}`).update({
+                title,
+                message
+            }).then(() => {
+                closeEditNotifModal();
+                alert("Notification updated successfully!");
+            });
+        }
+
+        function deleteNotification(key) {
+            if (!confirm("Delete this notification?")) return;
+            database.ref(`notifications/${key}`).remove().then(() => {
+                alert("Notification deleted.");
+            });
+        }
+
+        function clearAllNotifications() {
+            if (!confirm("Are you sure you want to DELETE ALL notifications?")) return;
+            database.ref('notifications').remove().then(() => {
+                alert("All notifications cleared.");
+            });
+        }
+
+        // --- APP UPDATE POPUP SETTINGS ---
+        function populateAppUpdateInputs() {
+            const update = settingsData.appUpdate || {};
+            document.getElementById('update-version-input').value = update.latestVersion || "1.0.0";
+            document.getElementById('update-title-input').value = update.title || "New Update Available!";
+            document.getElementById('update-download-url').value = update.downloadUrl || "";
+            document.getElementById('update-changelog-input').value = update.changelog || "";
+            document.getElementById('update-force-toggle').checked = update.forceUpdate === true;
+        }
+
+        function saveAppUpdateSettings() {
+            const latestVersion = document.getElementById('update-version-input').value.trim();
+            const title = document.getElementById('update-title-input').value.trim();
+            const downloadUrl = document.getElementById('update-download-url').value.trim();
+            const changelog = document.getElementById('update-changelog-input').value.trim();
+            const forceUpdate = document.getElementById('update-force-toggle').checked;
+
+            if (!latestVersion) { alert("Version number is required (e.g. 2.0.0)"); return; }
+
+            database.ref('settings/appUpdate').set({
+                latestVersion,
+                title,
+                downloadUrl,
+                changelog,
+                forceUpdate,
+                updatedAt: Date.now()
+            }).then(() => {
+                alert("App Update Popup configuration saved and live!");
+            });
+        }
+
+        function disableAppUpdatePopup() {
+            database.ref('settings/appUpdate/latestVersion').set("1.0.0").then(() => {
+                document.getElementById('update-version-input').value = "1.0.0";
+                alert("Update popup disabled for version 1.0.0 users.");
+            });
+        }
+
+        // --- GLOBAL SETTINGS (PAYMENT QR URL, UPI, WITHDRAWAL) ---
+        function populateSettingsInputs() {
+            document.getElementById('setting-app-name').value = settingsData.appName || "Keeva Money";
+            document.getElementById('setting-qr-url').value = settingsData.qrCodeUrl || "";
+            document.getElementById('setting-upi').value = settingsData.upiAddress || "auraenergy@ybl";
+            document.getElementById('quick-upi-input').value = settingsData.upiAddress || "auraenergy@ybl";
+            document.getElementById('setting-min-withdraw').value = settingsData.minWithdraw || 200;
+            document.getElementById('setting-max-withdraw').value = settingsData.maxWithdraw || 50000;
+            document.getElementById('setting-withdraw-fee').value = settingsData.withdrawFee || 10;
+            document.getElementById('setting-ref-domain').value = settingsData.refDomainUrl || "";
+            document.getElementById('setting-tg-channel').value = settingsData.tgChannel || "auraaenergy";
+            document.getElementById('setting-tg-support').value = settingsData.tgSupport || "auraaenergy";
+            document.getElementById('quick-marquee-input').value = settingsData.marqueeNotice || "";
+        }
+
+        function saveAllSettings() {
+            const appName = document.getElementById('setting-app-name').value.trim();
+            const qrCodeUrl = document.getElementById('setting-qr-url').value.trim();
+            const upiAddress = document.getElementById('setting-upi').value.trim();
+            const minWithdraw = parseFloat(document.getElementById('setting-min-withdraw').value) || 200;
+            const maxWithdraw = parseFloat(document.getElementById('setting-max-withdraw').value) || 50000;
+            const withdrawFee = parseFloat(document.getElementById('setting-withdraw-fee').value) || 10;
+            const refDomainUrl = document.getElementById('setting-ref-domain').value.trim();
+            const tgChannel = document.getElementById('setting-tg-channel').value.trim();
+            const tgSupport = document.getElementById('setting-tg-support').value.trim();
+
+            database.ref('settings').update({
+                appName,
+                qrCodeUrl,
+                upiAddress,
+                minWithdraw,
+                maxWithdraw,
+                withdrawFee,
+                refDomainUrl,
+                tgChannel,
+                tgSupport
+            }).then(() => {
+                alert("Global Settings & Payment QR saved successfully!");
+            });
+        }
+
+        function saveQuickMarquee() {
+            const val = document.getElementById('quick-marquee-input').value.trim();
+            database.ref('settings/marqueeNotice').set(val).then(() => {
+                alert("Top Marquee Notice updated!");
+            });
+        }
+
+        function saveQuickUpi() {
+            const val = document.getElementById('quick-upi-input').value.trim();
+            database.ref('settings/upiAddress').set(val).then(() => {
+                alert("Merchant UPI updated!");
+            });
+        }
+
+        // --- PRODUCTS MANAGEMENT ---
+        function renderProductsGrid() {
+            const grid = document.getElementById('products-grid');
+            if (!grid) return;
+
+            if (productsData.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 glass-panel rounded-2xl text-slate-500 font-mono">No products active. Click "Add New Plan" to create one.</div>`;
+                return;
+            }
+
+            grid.innerHTML = productsData.map((p, idx) => `
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10 space-y-3 p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="h-36 rounded-xl overflow-hidden mb-3">
+                            <img src="${p.image}" class="w-full h-full object-cover">
+                        </div>
+                        <h4 class="text-sm font-bold text-white">${p.name}</h4>
+                        <div class="space-y-1 font-mono text-xs text-slate-400 mt-2">
+                            <div class="flex justify-between"><span>Price:</span><strong class="text-white">₹${p.price}</strong></div>
+                            <div class="flex justify-between"><span>Daily Profit:</span><strong class="text-emerald-400">₹${p.daily}</strong></div>
+                            <div class="flex justify-between"><span>Term:</span><strong class="text-white">${p.term} Days</strong></div>
+                            <div class="flex justify-between border-t border-slate-800 pt-1"><span>Total ROI:</span><strong class="text-cyan-400">₹${p.daily * p.term}</strong></div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="deleteProduct(${idx})" class="w-full py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 text-xs font-bold rounded-xl">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openProductModal() {
+            document.getElementById('prod-name').value = '';
+            document.getElementById('prod-price').value = '';
+            document.getElementById('prod-daily').value = '';
+            document.getElementById('prod-term').value = '';
+            document.getElementById('prod-image').value = 'https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=600&auto=format&fit=crop';
+            document.getElementById('modal-product').classList.remove('hidden');
+        }
+        function closeProductModal() {
+            document.getElementById('modal-product').classList.add('hidden');
+        }
+        function saveProduct() {
+            const name = document.getElementById('prod-name').value.trim();
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const daily = parseFloat(document.getElementById('prod-daily').value);
+            const term = parseInt(document.getElementById('prod-term').value);
+            const image = document.getElementById('prod-image').value.trim();
+
+            if (!name || isNaN(price) || isNaN(daily) || isNaN(term) || !image) {
+                alert("Please fill all plan fields.");
+                return;
+            }
+
+            productsData.push({ name, price, daily, term, image });
+            database.ref('products').set(productsData).then(() => {
+                closeProductModal();
+                alert("New investment plan published!");
+            });
+        }
+        function deleteProduct(idx) {
+            if (!confirm("Delete this investment plan?")) return;
+            productsData.splice(idx, 1);
+            database.ref('products').set(productsData).then(() => {
+                alert("Plan deleted.");
+            });
+        }
+
+        // --- PROMO CODES ---
+        function renderPromoCodesTable() {
+            const tbody = document.getElementById('promos-tbody');
+            if (!tbody) return;
+
+            const entries = Object.keys(promoCodesData).map(k => ({ key: k, ...promoCodesData[k] })).reverse();
+            if (entries.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500 font-sans">No promo codes active.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = entries.map(c => `
+                <tr class="hover:bg-slate-900/50 transition-colors">
+                    <td class="p-3.5 font-bold text-amber-400">${c.code}</td>
+                    <td class="p-3.5 font-bold text-emerald-400">₹${c.rewardAmount}</td>
+                    <td class="p-3.5 text-white">${c.claimedCount || 0} / ${c.maxRedemptions || '∞'}</td>
+                    <td class="p-3.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${c.status === 'expired' ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}">${c.status || 'active'}</span>
+                    </td>
+                    <td class="p-3.5 text-right font-sans">
+                        <button onclick="deletePromoCode('${c.key}')" class="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-[10px] font-bold">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openPromoCreateModal() {
+            document.getElementById('promo-code-input').value = 'GIFT' + Math.floor(100 + Math.random() * 900);
+            document.getElementById('promo-reward-input').value = '50';
+            document.getElementById('promo-limit-input').value = '100';
+            document.getElementById('modal-promo').classList.remove('hidden');
+        }
+        function closePromoCreateModal() {
+            document.getElementById('modal-promo').classList.add('hidden');
+        }
+        function savePromoCode() {
+            const code = document.getElementById('promo-code-input').value.trim().toUpperCase();
+            const rewardAmount = parseFloat(document.getElementById('promo-reward-input').value);
+            const maxRedemptions = parseInt(document.getElementById('promo-limit-input').value) || 0;
+
+            if (!code || isNaN(rewardAmount)) { alert("Enter valid code and reward amount."); return; }
+
+            database.ref('promoCodes').push({
+                code,
+                rewardAmount,
+                maxRedemptions,
+                claimedCount: 0,
+                status: 'active',
+                createdAt: Date.now()
+            }).then(() => {
+                closePromoCreateModal();
+                alert(`Promo code ${code} published!`);
+            });
+        }
+        function deletePromoCode(key) {
+            if (!confirm("Delete promo code?")) return;
+            database.ref(`promoCodes/${key}`).remove();
+        }
+
+        // --- LIVE CHAT SUPPORT ---
+        function renderSupportChatsList() {
+            const container = document.getElementById('support-chats-list');
+            if (!container) return;
+
+            const chats = Object.values(supportChatsData).sort((a, b) => (b.lastUpdated || 0) - (a.lastUpdated || 0));
+            if (chats.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-xs text-slate-500 font-mono">No chat conversations yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = chats.map(c => `
+                <div onclick="selectActiveChatUser('${c.phone}')" class="p-3 rounded-xl border ${currentActiveChatUser === c.phone ? 'bg-indigo-600/20 border-indigo-500' : 'bg-slate-900 border-slate-800'} cursor-pointer hover:border-slate-700 transition-all">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-white">${c.name || 'User'}</span>
+                        <span class="text-[9px] text-slate-400 font-mono">${c.phone}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 truncate mt-1">${c.lastMessage || '...'}</p>
+                </div>
+            `).join('');
+        }
+
+        function selectActiveChatUser(phone) {
+            currentActiveChatUser = phone;
+            const chat = supportChatsData[phone];
+            document.getElementById('active-chat-user-name').innerText = chat ? (chat.name || 'User') : 'User';
+            document.getElementById('active-chat-user-phone').innerText = `Phone: +91 ${phone}`;
+
+            renderSupportChatsList();
+
+            database.ref(`supportChats/${phone}/messages`).on('value', snapshot => {
+                const box = document.getElementById('admin-chat-messages');
+                if (!box) return;
+
+                if (!snapshot.exists()) {
+                    box.innerHTML = `<div class="text-center py-10 text-slate-500">No messages in this chat.</div>`;
+                    return;
+                }
+
+                const msgs = Object.values(snapshot.val());
+                box.innerHTML = msgs.map(m => {
+                    const isAdmin = m.sender === 'admin';
+                    const isBot = m.sender === 'bot';
+                    return `
+                        <div class="flex flex-col ${isAdmin ? 'items-end' : 'items-start'} space-y-1">
+                            <span class="text-[9px] text-slate-400 font-mono">${isAdmin ? 'You (Admin)' : isBot ? 'Auto Bot' : 'User'} • ${m.time || ''}</span>
+                            <div class="${isAdmin ? 'bg-indigo-600 text-white rounded-tr-none' : isBot ? 'bg-slate-800 border border-slate-700 text-orange-300 rounded-tl-none' : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-tl-none'} px-3 py-2 rounded-2xl max-w-[80%]">
+                                ${m.text}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        function sendAdminChatReply() {
+            if (!currentActiveChatUser) { alert("Please select a user conversation first."); return; }
+            const input = document.getElementById('admin-reply-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const timeStr = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+            database.ref(`supportChats/${currentActiveChatUser}/messages`).push({
+                sender: 'admin',
+                text,
+                time: timeStr,
+                timestamp: Date.now()
+            });
+
+            database.ref(`supportChats/${currentActiveChatUser}`).update({
+                lastUpdated: Date.now(),
+                lastMessage: text
+            });
+
+            input.value = '';
+        }
+
+        // --- PROBLEM TICKETS ---
+        function renderProblemTickets() {
+            const container = document.getElementById('tickets-list');
+            if (!container) return;
+
+            const tickets = Object.values(problemTicketsData).reverse();
+            if (tickets.length === 0) {
+                container.innerHTML = `<div class="text-center py-12 glass-panel rounded-2xl text-slate-500 font-mono">No problem tickets submitted yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = tickets.map(t => {
+                const isSolved = t.status === 'solved';
+                return `
+                    <div class="glass-panel p-5 rounded-2xl border border-white/10 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 font-mono">${t.date || ''} • Phone: ${t.phone}</span>
+                                <h4 class="text-sm font-extrabold text-white mt-0.5">${t.category} (${t.userName || 'User'})</h4>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${isSolved ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">
+                                ${isSolved ? 'Solved ✓' : 'Pending Review'}
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800 leading-relaxed font-sans">${t.details}</p>
+                        
+                        ${t.photoUrl ? `
+                            <div class="pt-1">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Attached Screenshot:</span>
+                                <a href="${t.photoUrl}" target="_blank">
+                                    <img src="${t.photoUrl}" class="max-h-40 rounded-xl border border-slate-800 object-contain bg-black">
+                                </a>
+                            </div>
+                        ` : ''}
+
+                        ${isSolved && t.adminReply ? `
+                            <div class="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl text-xs text-emerald-300">
+                                <strong class="block text-[10px] uppercase font-mono">Your Sent Reply:</strong> ${t.adminReply}
+                            </div>
+                        ` : `
+                            <div class="flex justify-end pt-2">
+                                <button onclick="openTicketReplyModal('${t.ticketId}', '${t.phone}', '${t.details.replace(/'/g, "\'")}')" class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-teal-500 hover:brightness-110 text-white rounded-xl text-xs font-bold">Reply & Resolve</button>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openTicketReplyModal(ticketId, phone, details) {
+            selectedTicketKey = ticketId;
+            selectedTicketPhone = phone;
+            document.getElementById('ticket-reply-summary').innerText = `Issue: "${details}"`;
+            document.getElementById('ticket-reply-text').value = "";
+            document.getElementById('modal-ticket-reply').classList.remove('hidden');
+        }
+        function closeTicketReplyModal() {
+            document.getElementById('modal-ticket-reply').classList.add('hidden');
+            selectedTicketKey = null;
+            selectedTicketPhone = null;
+        }
+        function submitTicketReply() {
+            const reply = document.getElementById('ticket-reply-text').value.trim();
+            if (!reply) { alert("Please type your reply solution."); return; }
+
+            const updates = {
+                status: 'solved',
+                adminReply: reply
+            };
+
+            database.ref(`problemTickets/${selectedTicketKey}`).update(updates);
+            database.ref(`users/${selectedTicketPhone}/problemTickets/${selectedTicketKey}`).update(updates).then(() => {
+                closeTicketReplyModal();
+                alert("Reply sent and ticket marked as Solved!");
+            });
+        }
+
+        // --- BANNERS MANAGER ---
+        function renderBannersGrid() {
+            const grid = document.getElementById('banners-grid');
+            if (!grid) return;
+
+            if (bannersData.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 glass-panel rounded-2xl text-slate-500 font-mono">No banners found.</div>`;
+                return;
+            }
+
+            grid.innerHTML = bannersData.map((b, idx) => `
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10 space-y-3 p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="h-32 rounded-xl overflow-hidden mb-2 relative">
+                            <img src="${b.image}" class="w-full h-full object-cover">
+                            <span class="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-black px-2 py-0.5 rounded">${b.tag || 'PROMO'}</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-white">${b.title}</h4>
+                        <p class="text-[11px] text-slate-400 mt-1">${b.subtitle || ''}</p>
+                        ${b.link ? `<p class="text-[10px] text-indigo-400 font-mono truncate mt-1">Go Link: ${b.link}</p>` : ''}
+                    </div>
+                    <div class="pt-2">
+                        <button onclick="deleteBanner(${idx})" class="w-full py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 text-xs font-bold rounded-xl">Remove Banner</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openBannerCreateModal() {
+            document.getElementById('banner-tag').value = 'BONUS';
+            document.getElementById('banner-title').value = '';
+            document.getElementById('banner-subtitle').value = '';
+            document.getElementById('banner-image').value = 'https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=1200&auto=format&fit=crop';
+            document.getElementById('banner-link').value = '';
+            document.getElementById('modal-banner').classList.remove('hidden');
+        }
+        function closeBannerModal() {
+            document.getElementById('modal-banner').classList.add('hidden');
+        }
+        function saveBanner() {
+            const tag = document.getElementById('banner-tag').value.trim();
+            const title = document.getElementById('banner-title').value.trim();
+            const subtitle = document.getElementById('banner-subtitle').value.trim();
+            const image = document.getElementById('banner-image').value.trim();
+            const link = document.getElementById('banner-link').value.trim();
+
+            if (!title || !image) { alert("Title and Image URL are required."); return; }
+
+            bannersData.push({ tag, title, subtitle, image, link });
+            database.ref('settings/banners').set(bannersData).then(() => {
+                closeBannerModal();
+                alert("Banner saved and live on user home screen!");
+            });
+        }
+        function deleteBanner(idx) {
+            if (!confirm("Delete this banner?")) return;
+            bannersData.splice(idx, 1);
+            database.ref('settings/banners').set(bannersData).then(() => {
+                alert("Banner removed.");
+            });
+        }
+
+        // AUTO INITIALIZE ON LOAD
+        window.addEventListener('load', () => {
+            initRealtimeListeners();
+        });
+    </script>
+</body>
+</html>
